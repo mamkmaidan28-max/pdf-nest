@@ -1,0 +1,6 @@
+{
+  "name": "PDF Nest",
+  "description": "All your PDF tools in one place",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
