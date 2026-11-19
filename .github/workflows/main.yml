@@ -40,10 +40,17 @@ jobs:
           STORE_PASSWORD: ${{ secrets.KEY_PASS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASS }}
         run: gradle assembleRelease
+      - name: Check APK signature
+        run: |
+          APK=$(find . -path "*build/outputs/apk/release/*.apk" | head -n 1)
+          ls -la "$(dirname "$APK")" > check.txt
+          APKSIGNER=$(ls $ANDROID_HOME/build-tools/*/apksigner | sort -V | tail -1)
+          "$APKSIGNER" verify --verbose --print-certs "$APK" >> check.txt 2>&1 || echo "VERIFY FAILED" >> check.txt
+          cat check.txt
       - name: Publish to Releases
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           APK=$(find . -path "*build/outputs/apk/release/*.apk" | head -n 1)
           cp "$APK" pdf-nest.apk
-          gh release create "release-${{ github.run_number }}" pdf-nest.apk --title "PDF Nest release ${{ github.run_number }}" --notes "Signed release APK"
+          gh release create "release-${{ github.run_number }}" pdf-nest.apk --title "PDF Nest release ${{ github.run_number }}" --notes-file check.txt
